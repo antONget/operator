@@ -43,7 +43,7 @@ async def process_add_user(callback: CallbackQuery) -> None:
 async def process_description(callback: CallbackQuery) -> None:
     logging.info(f'process_description: {callback.message.chat.id}')
     list_user = get_list_users()
-    keyboard = keyboards_del_users(list_user, 0, 2, 2)
+    keyboard = keyboards_del_users(list_user, 0, 2, 6)
     await callback.message.edit_text(text='Выберите пользователя, которого вы хотите удалить',
                                   reply_markup=keyboard)
 
@@ -55,7 +55,7 @@ async def process_forward(callback: CallbackQuery) -> None:
     list_user = get_list_users()
     forward = int(callback.data.split('_')[1]) + 1
     back = forward - 2
-    keyboard = keyboards_del_users(list_user, back, forward, 2)
+    keyboard = keyboards_del_users(list_user, back, forward, 6)
     try:
         await callback.message.edit_text(text='Выберите пользователя, которого вы хотите удалить',
                                          reply_markup=keyboard)
@@ -71,7 +71,7 @@ async def process_back(callback: CallbackQuery) -> None:
     list_user = get_list_users()
     back = int(callback.data.split('_')[1]) - 1
     forward = back + 2
-    keyboard = keyboards_del_users(list_user, back, forward, 2)
+    keyboard = keyboards_del_users(list_user, back, forward, 6)
     try:
         await callback.message.edit_text(text='Выберите пользователя, которого вы хотите удалить',
                                          reply_markup=keyboard)

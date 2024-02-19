@@ -8,8 +8,19 @@ from filter.admin_filter import chek_manager
 from module.data_base import create_table_users, add_super_admin, get_list_users, get_operator, update_operator
 from module.calendar import is_working_day
 from keyboards.keyboards_admin import keyboards_superadmin, keyboard_question
+import requests
+from config_data.config import Config, load_config
 
 router = Router()
+config: Config = load_config()
+
+
+def get_telegram_user(user_id, bot_token):
+    url = f'https://api.telegram.org/bot{bot_token}/getChat'
+    data = {'chat_id': user_id}
+    response = requests.post(url, data=data)
+    print(response.json())
+    return response.json()
 
 
 async def sendler_question(bot: Bot):
@@ -21,9 +32,19 @@ async def sendler_question(bot: Bot):
         list_users = get_list_users()
         print(list_users)
         for user in list_users:
-            await bot.send_message(chat_id=user[0],
-                                   text=f"Вы дежурный?",
-                                   reply_markup=keyboard_question(telegram_id=user[0]))
+            print(user)
+            result = get_telegram_user(user[0], config.tg_bot.token)
+            if 'result' in result:
+                await bot.send_message(chat_id=843554518,
+                                       text=f"Вы дежурный?\nПользователь: {user[1]} id:{user[0]}",
+                                       reply_markup=keyboard_question(telegram_id=user[0]))
+                # await bot.send_message(chat_id=user[0],
+                #                        text=f"Вы дежурный?",
+                #                        reply_markup=keyboard_question(telegram_id=user[0]))
+            else:
+                await bot.send_message(chat_id=843554518,
+                                       text=f"Пользователь: {user[1]} id:{user[0]} не запустил бот",
+                                       reply_markup=keyboard_question(telegram_id=user[0]))
 
 scheduler = AsyncIOScheduler(timezone="Europe/Moscow")
 
@@ -39,9 +60,9 @@ async def process_start_command_superadmin(message: Message, bot: Bot) -> None:
     create_table_users()
     add_super_admin(id_admin=message.chat.id, user_name=message.from_user.username)
     # запускаем процесс обновления таблицы
-    scheduler.add_job(update_operator, 'cron', hour=10, minute=45, second=0)
+    scheduler.add_job(update_operator, 'cron', hour=11, minute=0, second=0)
     # scheduler.add_job(update_operator, 'interval', seconds=60*5)
-    scheduler.add_job(sendler_question, 'interval', seconds=60*30, args=(bot,))
+    scheduler.add_job(sendler_question, 'interval', seconds=60*3, args=(bot,))
     scheduler.start()
     await message.answer(text="Вы администратор проекта, вы можете приглашать новых пользователей и назначать дежурных",
                          reply_markup=keyboards_superadmin())

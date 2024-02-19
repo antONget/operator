@@ -8,13 +8,20 @@ from module.data_base import get_list_users, get_user, set_operator
 from keyboards.keyboards_admin_operator import keyboards_set_operator, keyboard_set_user_operator
 from filter.admin_filter import chek_manager
 from config_data.config import Config, load_config
-
+import requests
 
 config: Config = load_config()
 
 router = Router()
 user_dict = {}
 
+
+def get_telegram_user(user_id, bot_token):
+    url = f'https://api.telegram.org/bot{bot_token}/getChat'
+    data = {'chat_id': user_id}
+    response = requests.post(url, data=data)
+    print(response.json())
+    return response.json()
 
 # ДЕЖУРНЫЙ
 @router.message(F.text == 'Назначить дежурного', lambda message: chek_manager(message.chat.id))
@@ -96,18 +103,23 @@ async def process_setoperatordone(callback: CallbackQuery, state: FSMContext, bo
 async def process_setoperatoryes(callback: CallbackQuery, bot: Bot) -> None:
     logging.info(f'process_setoperatoryes: {callback.message.chat.id}')
     set_telegram_id_operator = int(callback.data.split('_')[1])
+    print(set_telegram_id_operator)
     set_operator(telegram_id=set_telegram_id_operator)
     get_user(set_telegram_id_operator)
     user_name = get_user(telegram_id=set_telegram_id_operator)
     list_users = get_list_users()
+    print(list_users)
     for user in list_users:
-        try:
+        result = get_telegram_user(user_id=user[0], bot_token=config.tg_bot.token)
+        if 'result' in result:
             await bot.send_message(chat_id=user[0],
                                    text=f"Пользователь {user_name[0]} взял дежурство")
-        except:
+        else:
             for admin_id in config.tg_bot.admin_ids.split(','):
-                await bot.send_message(chat_id=int(admin_id),
-                                       text=f"Пользователь {user[1]} не оповещен")
+                result = get_telegram_user(user_id=int(admin_id), bot_token=config.tg_bot.token)
+                if 'result' in result:
+                    await bot.send_message(chat_id=int(admin_id),
+                                           text=f"Пользователь {user[1]} не оповещен")
 
 
 
