@@ -34,7 +34,7 @@ def keyboards_set_operator(list_users: list, back: int, forward: int, count: int
     for row in list_users[back*count:(forward-1)*count]:
         print(row)
         text = row[1]
-        button = f'setoperator_{row[0]}'
+        button = f'setoperator#{row[0]}'
         buttons.append(InlineKeyboardButton(
             text=text,
             callback_data=button))

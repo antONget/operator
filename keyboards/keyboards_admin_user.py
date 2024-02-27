@@ -50,7 +50,7 @@ def keyboards_del_users(list_users: list, back: int, forward: int, count: int):
     for row in list_users[back*count:(forward-1)*count]:
         print(row)
         text = row[1]
-        button = f'deleteuser_{row[0]}'
+        button = f'deleteuser#{row[0]}'
         buttons.append(InlineKeyboardButton(
             text=text,
             callback_data=button))

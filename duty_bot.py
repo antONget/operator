@@ -30,7 +30,7 @@ async def main():
     bot = Bot(token=config.tg_bot.token, parse_mode='HTML')
     dp = Dispatcher()
     scheduler = AsyncIOScheduler(timezone="Europe/Moscow")
-    scheduler.add_job(update_operator, 'cron', hour=8, minute=0, second=0)
+    scheduler.add_job(update_operator, 'cron', hour=9, minute=0, second=0)
     # scheduler.add_job(update_operator, 'interval', seconds=60*5)
     scheduler.add_job(sendler_question, 'interval', seconds=60 * 30, args=(bot,))
     scheduler.start()
