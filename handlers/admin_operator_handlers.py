@@ -123,4 +123,7 @@ async def process_setoperatoryes(callback: CallbackQuery, bot: Bot) -> None:
                                            text=f"Пользователь {user[1]} не оповещен")
 
 
-
+@router.callback_query(F.data == "notsetoperatordone")
+async def process_notsetoperatordone(callback: CallbackQuery) -> None:
+    logging.info(f'process_notsetoperatordone: {callback.message.chat.id}')
+    await process_set_operator(callback.message)
