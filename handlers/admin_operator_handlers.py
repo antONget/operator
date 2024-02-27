@@ -90,10 +90,11 @@ async def process_setoperatordone(callback: CallbackQuery, state: FSMContext, bo
     user_name = get_user(telegram_id=set_telegram_id_operator)
     list_users = get_list_users()
     for user in list_users:
-        try:
+        result = get_telegram_user(user_id=user[0], bot_token=config.tg_bot.token)
+        if 'result' in result:
             await bot.send_message(chat_id=user[0],
                                    text=f"Пользователь {user_name[0]} назначен дежурным")
-        except:
+        else:
             user_name = get_user(telegram_id=user[0])
             await callback.message.answer(text=f"Пользователь {user[1]} не оповещен")
     await callback.message.answer(text="Рассылка завершена!")

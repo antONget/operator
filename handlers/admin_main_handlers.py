@@ -38,15 +38,15 @@ async def sendler_question(bot: Bot):
                 await bot.send_message(chat_id=843554518,
                                        text=f"Вы дежурный?\nПользователь: {user[1]} id:{user[0]}",
                                        reply_markup=keyboard_question(telegram_id=user[0]))
-                # await bot.send_message(chat_id=user[0],
-                #                        text=f"Вы дежурный?",
-                #                        reply_markup=keyboard_question(telegram_id=user[0]))
+                await bot.send_message(chat_id=user[0],
+                                       text=f"Вы дежурный?",
+                                       reply_markup=keyboard_question(telegram_id=user[0]))
             else:
                 await bot.send_message(chat_id=843554518,
                                        text=f"Пользователь: {user[1]} id:{user[0]} не запустил бот",
                                        reply_markup=keyboard_question(telegram_id=user[0]))
 
-scheduler = AsyncIOScheduler(timezone="Europe/Moscow")
+
 
 
 @router.message(CommandStart(), lambda message: chek_manager(message.chat.id))
@@ -60,9 +60,6 @@ async def process_start_command_superadmin(message: Message, bot: Bot) -> None:
     create_table_users()
     add_super_admin(id_admin=message.chat.id, user_name=message.from_user.username)
     # запускаем процесс обновления таблицы
-    scheduler.add_job(update_operator, 'cron', hour=11, minute=0, second=0)
-    # scheduler.add_job(update_operator, 'interval', seconds=60*5)
-    scheduler.add_job(sendler_question, 'interval', seconds=60*3, args=(bot,))
-    scheduler.start()
+
     await message.answer(text="Вы администратор проекта, вы можете приглашать новых пользователей и назначать дежурных",
                          reply_markup=keyboards_superadmin())
