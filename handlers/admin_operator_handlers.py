@@ -3,7 +3,7 @@ from aiogram.types import CallbackQuery, Message
 from aiogram.fsm.context import FSMContext
 
 import logging
-from module.data_base import get_list_users, get_user, set_operator
+from module.data_base import get_list_users, get_user, set_operator, get_operator, del_operator
 
 from keyboards.keyboards_admin_operator import keyboards_set_operator, keyboard_set_user_operator
 from filter.admin_filter import chek_manager
@@ -20,7 +20,7 @@ def get_telegram_user(user_id, bot_token):
     url = f'https://api.telegram.org/bot{bot_token}/getChat'
     data = {'chat_id': user_id}
     response = requests.post(url, data=data)
-    print(response.json())
+    # print(response.json())
     return response.json()
 
 # ДЕЖУРНЫЙ
@@ -85,18 +85,27 @@ async def process_setoperatordone(callback: CallbackQuery, state: FSMContext, bo
     logging.info(f'process_setoperatordone: {callback.message.chat.id}')
     user_dict[callback.message.chat.id] = await state.get_data()
     set_telegram_id_operator = user_dict[callback.message.chat.id]['set_telegram_id_operator']
-    set_operator(telegram_id=set_telegram_id_operator)
-    get_user(set_telegram_id_operator)
+
     user_name = get_user(telegram_id=set_telegram_id_operator)
     list_users = get_list_users()
     for user in list_users:
         result = get_telegram_user(user_id=user[0], bot_token=config.tg_bot.token)
         if 'result' in result:
-            await bot.send_message(chat_id=user[0],
-                                   text=f"Пользователь {user_name[0]} назначен дежурным")
+            # проверяем есть ли дежурный
+            if get_operator():
+                print(get_operator())
+                telegram_id_old_operator = get_operator()[0][2]
+                del_operator(telegram_id_old_operator)
+                username_old_operator = get_user(telegram_id_old_operator)[0]
+                await bot.send_message(chat_id=user[0],
+                                       text=f"Пользователь {user_name[0]} назначен дежурным вместо {username_old_operator}")
+            else:
+                await bot.send_message(chat_id=user[0],
+                                       text=f"Пользователь {user_name[0]} назначен дежурным")
         else:
             user_name = get_user(telegram_id=user[0])
             await callback.message.answer(text=f"Пользователь {user[1]} не оповещен")
+    set_operator(telegram_id=set_telegram_id_operator)
     await callback.message.answer(text="Рассылка завершена!")
 
 

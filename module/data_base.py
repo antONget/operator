@@ -115,6 +115,16 @@ def set_operator(telegram_id):
     db.commit()
 
 
+def del_operator(telegram_id):
+    """
+    Установить дежурного
+    :param telegram_id:
+    :return:
+    """
+    logging.info(f'set_operator')
+    sql.execute('UPDATE users SET operator = ? WHERE telegram_id = ?', (0, telegram_id))
+    db.commit()
+
 def update_operator():
     logging.info(f'update_operator')
     sql.execute('UPDATE users SET operator = ?', (0,))
