@@ -38,7 +38,7 @@ async def process_set_operator(message: Message) -> None:
 
 
 # >>>>
-@router.callback_query(F.data.startswith('forwardoperator'))
+@router.callback_query(F.data.startswith('foperator'))
 async def process_forward(callback: CallbackQuery) -> None:
     logging.info(f'process_forward: {callback.message.chat.id}')
     list_user = get_list_users()
@@ -54,7 +54,7 @@ async def process_forward(callback: CallbackQuery) -> None:
 
 
 # <<<<
-@router.callback_query(F.data.startswith('backoperator'))
+@router.callback_query(F.data.startswith('boperator'))
 async def process_back(callback: CallbackQuery) -> None:
     logging.info(f'process_back: {callback.message.chat.id}')
     list_user = get_list_users()

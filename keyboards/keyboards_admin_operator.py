@@ -39,11 +39,11 @@ def keyboards_set_operator(list_users: list, back: int, forward: int, count: int
             text=text,
             callback_data=button))
     button_back = InlineKeyboardButton(text='<<<<',
-                                       callback_data=f'backoperator_{str(back)}')
+                                       callback_data=f'boperator_{str(back)}')
     button_count = InlineKeyboardButton(text=f'{back+1}',
                                         callback_data='none')
     button_next = InlineKeyboardButton(text='>>>>',
-                                       callback_data=f'forwardoperator_{str(forward)}')
+                                       callback_data=f'foperator_{str(forward)}')
     kb_builder.row(*buttons, width=1)
     kb_builder.row(button_back, button_count, button_next)
     return kb_builder.as_markup()
