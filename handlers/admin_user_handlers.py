@@ -1,4 +1,4 @@
-from aiogram import Router, F
+from aiogram import Router, F, Bot
 from aiogram.types import CallbackQuery, Message
 from aiogram.fsm.context import FSMContext
 
@@ -35,7 +35,8 @@ async def process_add_user(callback: CallbackQuery) -> None:
     add_token(token_new)
     await callback.message.edit_text(text=f'Для добавления пользователя в бот отправьте ему этот TOKEN <code>{token_new}</code>.'
                                        f' По этому TOKEN может быть добавлен только один пользователь,'
-                                       f' не делитесь и не показывайте его никому, кроме тех лиц для кого он предназначен')
+                                       f' не делитесь и не показывайте его никому, кроме тех лиц для кого он предназначен',
+                                     parse_mode='html')
 
 
 # удалить пользователя
@@ -44,7 +45,7 @@ async def process_description(callback: CallbackQuery) -> None:
     logging.info(f'process_description: {callback.message.chat.id}')
     list_user = get_list_users()
     keyboard = keyboards_del_users(list_user, 0, 2, 6)
-    await callback.message.edit_text(text='Выберите пользователя, которого вы хотите удалить',
+    await callback.message.edit_text(text='Выберите пользователя, которoго вы хотитe удалить',
                                   reply_markup=keyboard)
 
 
@@ -87,14 +88,15 @@ async def process_deleteuser(callback: CallbackQuery, state: FSMContext) -> None
     telegram_id = int(callback.data.split('#')[1])
     user_info = get_user(telegram_id)
     await state.update_data(del_telegram_id=telegram_id)
-    await callback.message.edit_text(text=f'Удалить пользователя {user_info[0]}',
+    await callback.message.edit_text(text=f'Удaлить пользователя {user_info[0]}',
                                   reply_markup=keyboard_delete_user())
 
 
 # отмена удаления пользователя
 @router.callback_query(F.data == 'notdel_user')
-async def process_notdel_user(callback: CallbackQuery) -> None:
+async def process_notdel_user(callback: CallbackQuery, bot: Bot) -> None:
     logging.info(f'process_notdel_user: {callback.message.chat.id}')
+    await bot.delete_message(chat_id=callback.message.chat.id, message_id=callback.message.message_id)
     await process_change_list_users(callback.message)
 
 

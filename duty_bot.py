@@ -6,7 +6,8 @@ from config_data.config import Config, load_config
 from handlers import admin_main_handlers, admin_user_handlers, admin_operator_handlers
 from handlers import user_auth_handler
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from handlers.admin_main_handlers import update_operator, sendler_question
+from handlers.admin_main_handlers import temp_func
+from module.data_base import update_operator
 
 # Инициализируем logger
 logger = logging.getLogger(__name__)
@@ -30,10 +31,11 @@ async def main():
     bot = Bot(token=config.tg_bot.token, parse_mode='HTML')
     dp = Dispatcher()
     scheduler = AsyncIOScheduler(timezone="Europe/Moscow")
-    scheduler.add_job(update_operator, 'cron', hour=7, minute=30, second=0)
-    # scheduler.add_job(update_operator, 'interval', seconds=60*5)
-    scheduler.add_job(sendler_question, 'interval', seconds=60 * 30, args=(bot,))
+
+    scheduler.add_job(update_operator, 'cron', hour=7, minute=0, second=0)
+    scheduler.add_job(temp_func, 'cron', hour=7, minute=30, second=0, args=(bot, scheduler,))
     scheduler.start()
+    dp.workflow_data.update({'my_int_var': scheduler})
     # Регистрируем router в диспетчере
     dp.include_router(admin_main_handlers.router)
     dp.include_router(admin_user_handlers.router)

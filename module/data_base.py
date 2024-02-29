@@ -23,7 +23,8 @@ def create_table_users() -> None:
         telegram_id INTEGER,
         username TEXT,
         is_admin INTEGER,
-        operator INTEGER
+        operator INTEGER,
+        id_message DEFAULT 0
     )""")
     db.commit()
 
@@ -135,4 +136,21 @@ def get_operator():
     logging.info(f'get_operator')
     list_operator = sql.execute('SELECT * FROM users WHERE operator = ?', (1,)).fetchall()
     is_operator = [operator for operator in list_operator]
+    print(is_operator)
     return is_operator
+
+def set_message(telegram_id, id_message):
+    """
+    Установить дежурного
+    :param telegram_id:
+    :return:
+    """
+    logging.info(f'set_message')
+    sql.execute('UPDATE users SET id_message = ? WHERE telegram_id = ?', (id_message, telegram_id))
+    db.commit()
+
+def get_id_message():
+    logging.info(f'get_id_message')
+    list_message = sql.execute('SELECT telegram_id, id_message FROM users').fetchall()
+    list_id_message = [message for message in list_message]
+    return list_id_message
