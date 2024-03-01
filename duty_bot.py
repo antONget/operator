@@ -32,8 +32,8 @@ async def main():
     dp = Dispatcher()
     scheduler = AsyncIOScheduler(timezone="Europe/Moscow")
 
-    scheduler.add_job(update_operator, 'cron', hour=7, minute=0, second=0)
-    scheduler.add_job(temp_func, 'cron', hour=7, minute=30, second=0, args=(bot, scheduler,))
+    scheduler.add_job(update_operator, 'cron', hour=9, minute=0, second=0)
+    scheduler.add_job(temp_func, 'cron', hour=9, minute=30, second=0, args=(bot, scheduler,))
     scheduler.start()
     dp.workflow_data.update({'my_int_var': scheduler})
     # Регистрируем router в диспетчере
