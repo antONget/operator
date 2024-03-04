@@ -9,7 +9,7 @@ from module.calendar import is_working_day
 from keyboards.keyboards_admin import keyboards_superadmin, keyboard_question
 import requests
 from config_data.config import Config, load_config
-
+from datetime import datetime, time
 router = Router()
 config: Config = load_config()
 
@@ -27,12 +27,21 @@ def temp_func(bot: Bot, my_int_var):
     my_int_var.add_job(sendler_question, 'interval', id='sendler_question', seconds=60 * 30, args=(bot,))
 
 
+def is_time_between(begin_time, end_time, check_time=None):
+    # If check time is not given, default to current UTC time
+    check_time = check_time or datetime.utcnow().time()
+    if begin_time < end_time:
+        return check_time >= begin_time and check_time <= end_time
+    else: # crosses midnight
+        return check_time >= begin_time or check_time <= end_time
+
+
 async def sendler_question(bot: Bot):
     logging.info(f'sendler_question')
     # если дежурный не назначен и сегодня будний день
     print(not get_operator())
     print(is_working_day())
-    if not get_operator() and is_working_day():
+    if not get_operator() and is_working_day() and is_time_between(time(7-3, 50), time(23-3, 30)):
         list_users = get_list_users()
         print(list_users)
         for user in list_users:
